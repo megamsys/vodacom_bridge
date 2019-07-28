@@ -1,0 +1,78 @@
+//------------------------------------------------------------------------------
+//Filename: IsisCommon.idl
+// Description: System common types
+// Author: ISIS Information Systems
+// Date: 07 Jan 2003
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+//
+// Module Declaration: Isis
+//
+// Description: This module provides data types common to the
+// system components
+//
+//------------------------------------------------------------------------------
+#ifndef __ISISCOMMON__
+#define __ISISCOMMON__
+module Isis
+{
+//--------------------------------------------------------------------------
+// Type definitions, structs, enumerations, unions and constants
+//--------------------------------------------------------------------------
+typedef string<19> Date;
+// YYYY-MM-DD HH24:MM:SS
+// Attribute
+struct Attrib
+{
+string attributeName; // Attribute Name
+string attributeValue; // Attribute Value
+};
+// List of Attributes
+typedef sequence<Attrib> AttributeList;
+// Wide Attribute
+struct WAttrib
+{
+wstring attributeName; // Attribute Name
+wstring attributeValue; // Attribute Value
+};
+
+// List of Wide Attributes
+
+typedef sequence<WAttrib> WAttributeList;
+// Transaction Id
+typedef sequence<octet, 16> oct_16_seq;
+// Transaction Information
+struct TransactionInfo
+{
+string<2> originId;
+// Origin Id
+long userId; // User Id
+oct_16_seq txId; // Transaction Id
+string<16> externalUserId;
+// External System User Id
+};
+// Error groups
+enum ErrorGroup
+{
+APPLICATION_ERROR, // An application error ocurred
+DATABASE_ERROR, // A database error occured
+NO_DATA_ERROR, // A no data found error ocurred
+SYSTEM_ERROR, // A system error ocurred
+COMMUNICATIONS_ERROR // A communication error ocurred
+};
+//--------------------------------------------------------------------------
+// Exceptions
+//--------------------------------------------------------------------------
+
+
+// Interface exception
+exception InterfaceError
+{
+Isis::ErrorGroup errorGroup; // Error group
+string errorCode; // Error code
+string errorMsg; // Error message
+};
+};
+//------------------------------------------------------------------------------
+
+#endif

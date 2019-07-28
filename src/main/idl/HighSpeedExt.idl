@@ -1,0 +1,251 @@
+//------------------------------------------------------------------------------
+//Filename: HighSpeedExt.idl
+//Description: HighSpeed Manager Interface (LBP)
+//Author: ISIS Information Systems
+//Date: 9 November 2004
+//------------------------------------------------------------------------------
+//
+// Module Declaration: HighSpeed
+//
+// Description: This module provides a HighSpeed Manager Interface
+//
+//------------------------------------------------------------------------------
+#include "IsisCommon.idl"
+module HighSpeed
+{
+//--------------------------------------------------------------------------
+// Type definitions, structs, enumerations, unions and constants
+//--------------------------------------------------------------------------
+
+// Module version
+const string Version = "2.0.1";
+// Task result
+enum TaskResult
+{
+  successful,
+  failed,
+  unknown
+};
+
+// Service action
+struct ServiceAction
+{
+  string<15> currentSoId; // Current Service Offering on Offer
+  string<15> newSoId; // New Service Offering on Offer
+  string<3> actionType; // Action To Be Taken. Create, Delete, Modify
+  string<20> sid1; // Service ID
+  string<1> sid1Type; // Service ID Type
+  string<20> sid2;  // Service ID
+  string<1> sid2Type; // Service ID Type
+  string<20> sid3; // Service ID
+  string<1> sid3Type; // Service ID Type
+  string<20> sid4; // Service ID
+  string<1> sid4Type; // Service ID Type
+};
+// Service action list
+typedef sequence<ServiceAction> ServiceActionList;
+
+// Action attribute
+struct ActionAttribute
+{
+  string satId; // Service Attribute Id
+  string currentSacId; // Current Service Action Id
+  string newSacId; // New Service Action Id
+  string dateFrom; // Date From
+  string dateTo; // Date To
+};
+
+// Action attribute list
+typedef sequence<ActionAttribute> ActionAttributeList;
+// Subscriber Attribute
+struct SubAttribute
+{
+  string dateFrom; // Start date of the subscriber attribute
+  string dateTo; // End date of the subscriber
+  string benefitStartDate;  // Date subscriber 's VCRP benefits start
+  string attCatID;  // Attribute category id
+  string attCatDescription; // Attribute category description
+  string attTypeID;  // Attribute type id
+  string attTypeDescription; // Attribute type subscription
+};
+
+// Subscriber Attribute List
+typedef sequence<SubAttribute> SubAttributeList;
+
+// Party Contact List
+struct PartyContact
+{
+  long seq; // Unique ID
+  string<1> addressInd; // Type of Address (postal or physical) Indicator
+  string<19> fromDate; // Date subscriber attain address
+  string address1; // Flat, House or P.O. Box number
+  string address2; // Street Name
+  string address3; // Additional address information
+  string suburb; // Suburb
+  string town; // City/Town
+  string<19> toDate;  // Date subscriber relocated
+  string<12> postalCode; // Postal Code
+  string<2> countryId; // ID for country of residence
+  string region; // region of town
+};
+
+// Party Contact list
+typedef sequence<PartyContact> PartyContactList;
+
+// Party ID List
+struct PartyId
+{
+  long seq; // Unique ID
+  string<2> countryId;  // Country of issue of ID document
+  string<40> idNumber; // Indentification number
+  string<1> idType; // ID type
+};
+
+// Party ID list
+typedef sequence<PartyId> PartyIdList;
+
+// Party Role List
+struct PartyRole
+{
+  long seq;  // Unique ID
+  string<1> roleType; // Agent or Subscriber indicator
+  long suSeq; // ICAP ID
+};
+
+// Party Role list
+typedef sequence<PartyRole> PartyRoleList;
+
+// Party Contact Number List
+struct PartyContactNum
+{
+  long seq; // Unique ID
+  string<15> countryCode; // Country dialling code
+  string<15> areaNetCode; // Area network code
+  string<15> dialNum; // Dialling number
+  string<1> type; // Type
+};
+
+// Party Contact Number list
+typedef sequence<PartyContactNum> PartyContactNumList;
+
+// Customer Details consists of the following Party, PartyContact, PartyId, PartyRole, PartyContactNum
+struct Party
+{
+  long seq; // Details Id
+  long icapId; // Icap ID
+  string<1> icapRole;  // Icap Role
+  string<10> titleId; // Subscriber's Title e.g. Mr, Mrs, Prof
+  string surname; // Subscriber's Surname
+  string firstName; // Subscriber's First Name
+  string<40> initials; // Subscriber's Initials
+  string<3>  langCode; // Subscriber's Language
+  string<19> birthDate;  // Subscriber's date of birth
+  string<1> activeYN; // Subscriber's status flag
+  string<1> listedYN; // List subscriber on national directory flag
+  string<1> gender; // Subscriber's Gender
+  PartyContactList contactList; // Customer Contact List
+  PartyIdList idList; // Customer ID List
+  PartyRoleList roleList; // Role list
+  PartyContactNumList contactNumList; // Contact number list
+};
+
+// Service request result
+struct RequestResult
+{
+  string resultName; // Result Attribute Name
+  string resultValue; // Result Attribute Value
+};
+
+// Service request result list
+typedef sequence<RequestResult> RequestResultList;
+
+// Lookup Structure
+struct Lookup //---LookupIN---------------|---LookupOUT-----
+{  //--------------------------|-------------
+  string actionType; // ActionType | ActionType
+  string elementTwo; // SubscriberID | Listboxname
+  string elementThree; // SubscriberID Type | DisplayValue
+  string elementFour; // Listboxidentifier | ParValue
+  string elementFive; // Service provider Code | null
+  string elementSix; // Package Identifier  | Data Type
+  string elementSeven; // Service Type| Status
+};
+
+// List of Lookup structure
+typedef sequence<Lookup> LookupList;
+
+//--------------------------------------------------------------------------
+//
+// Interface declaration: HighSpeed Manager Interface
+//
+// Description: This interface provides Network Element Manager services.
+//
+//--------------------------------------------------------------------------
+interface Manager
+{
+//----------------------------------------------------------------------
+// Interface functions.
+//----------------------------------------------------------------------
+void PerformLogOn(
+  in string<2> originId, // Origin ID
+  in string<255> userName,  // User Name
+  in string<20> passWord, // Password
+  out long userId, // User Id
+  out string<255> securityKey) // Security Key
+  raises(Isis::InterfaceError);
+
+void PerformLogOff(
+  in string<2> originId, // Origin ID
+  in long userId, // User Id
+  in string<255> securityKey) // Security Key
+  raises(Isis::InterfaceError);
+
+TaskResult PerformFunction(
+  in string<2> originId, // Origin ID
+  in long userId, // User Id
+  in string<255> securityKey,  // Security Key
+  in string<32> functionSelector, // Function Identifier
+  inout Isis::AttributeList attributeList) // Function Attributes/Result Attributes
+  raises(Isis::InterfaceError);
+
+TaskResult ExecFunction(
+  in string<2> originId, // Origin ID
+  in long userId,  // User Id
+  in string<255> securityKey, // Security Key
+  in string<32> functionSelector, // Function Identifier
+  inout Isis::AttributeList attributeList, // Function Attributes/Result Attributes
+  inout HighSpeed::ServiceActionList serviceActionList, // List of Service Actions
+  inout HighSpeed::ActionAttributeList actionAttributeList, // List of Action Attributes
+  inout HighSpeed::Party partyDetails, // Party Details
+  out HighSpeed::RequestResultList requestResultList) // Service Request Results
+  raises(Isis::InterfaceError);
+
+TaskResult QueryFunction(
+  in string<2> originId, // Origin ID
+  in long userId,  // User Id
+  in string<255> securityKey, // Security Key
+  in string<32> functionSelector, // Function Identifier
+  inout Isis::AttributeList attributeList, // Function Attributes/Result Attributes
+  out HighSpeed::ServiceActionList serviceActionList, // List of Service Actions
+  out HighSpeed::ActionAttributeList actionAttributeList, // List of Action Attributes
+  out HighSpeed::SubAttributeList subAttributeList, // List of Subscriber Attributes
+  out HighSpeed::Party partyDetails,  // Party Details
+  out HighSpeed::RequestResultList requestResultList) // Service Request Results
+  raises(Isis::InterfaceError);
+
+TaskResult Lookup(
+  in string<2> originId, // Origin ID
+  in long userId, // User Id
+  in string<255> securityKey, // Security Key
+  in string<32> functionSelector, // Lookup Query Type
+  inout HighSpeed::LookupList lookupList) // Lookup results
+  raises(Isis::InterfaceError);
+
+boolean ValidateSecurityKey(
+  in string<2> originId,  // Origin ID
+  in long userId, // User Id
+  in string<255> securityKey)  // Security Key
+  raises(Isis::InterfaceError);
+};
+};
+//------------------------------------------------------------------------------
